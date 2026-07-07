@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://unpkg.com/@powersync/service-schema@latest/json-schema/powersync-config.json
+#
+# `!env NAME` substitutes the value of environment variable NAME (must be prefixed PS_).
+
+telemetry:
+  disable_telemetry_sharing: true
+
+# Where PowerSync reads app data from, via Postgres logical replication.
+replication:
+  connections:
+    - type: postgresql
+      uri: !env PS_DATA_SOURCE_URI
+      sslmode: disable # local dev only — use verify-full in any real deployment
+
+# Where PowerSync stores its own sync bucket state (unrelated to app data).
+storage:
+  type: postgresql
+  uri: !env PS_STORAGE_SOURCE_URI
+  sslmode: disable
+
+port: !env PS_PORT
+
+sync_config:
+  path: sync-config.yaml
+
+# How PowerSync verifies the JWT each client sends when connecting. Inline JWKS
+# means the public key is embedded here directly instead of fetched from a URL —
+# fine for local dev; a real deployment would point this at your auth provider's
+# JWKS endpoint instead (Auth0, Supabase, Firebase, your own backend, etc).
+client_auth:
+  jwks:
+    keys:
+      - kty: RSA
+        kid: !env PS_JWK_KID
+        alg: RS256
+        n: !env PS_JWK_N
+        e: !env PS_JWK_E
+  audience: ["powersync-dev", "powersync"]
+
+api:
+  tokens:
+    - use_a_better_token_in_production

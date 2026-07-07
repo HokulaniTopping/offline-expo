@@ -33,6 +33,10 @@ yarn-error.*
 # local env files
 .env*.local
 
+# PowerSync self-hosted stack (local secrets/state, see powersync/.env.example)
+powersync/.env
+powersync/keys/
+
 # typescript
 *.tsbuildinfo
 

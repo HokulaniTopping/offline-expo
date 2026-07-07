@@ -1,3 +1,7 @@
+// Must be imported first — PowerSync's watched queries rely on async iterators
+// that Hermes doesn't natively support yet.
+import '@azure/core-asynciterator-polyfill';
+
 import { registerRootComponent } from 'expo';
 
 import App from './App';

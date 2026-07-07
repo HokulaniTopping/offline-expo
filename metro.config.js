@@ -7,6 +7,19 @@ const config = getDefaultConfig(__dirname);
 
 config.resolver.assetExts.push('wasm');
 
+// PowerSync's recommended Metro config: prevents inline-requires from breaking
+// its internal module initialization order. See @powersync/react-native README.
+config.transformer.getTransformOptions = async () => ({
+  transform: {
+    experimentalImportSupport: false,
+    inlineRequires: {
+      blockList: {
+        [require.resolve('@powersync/react-native')]: true,
+      },
+    },
+  },
+});
+
 config.server = {
   ...config.server,
   enhanceMiddleware: (middleware) => {
