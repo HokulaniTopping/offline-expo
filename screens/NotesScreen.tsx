@@ -1,5 +1,5 @@
-import { useSQLiteContext } from 'expo-sqlite';
-import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@powersync/react';
+import { useState } from 'react';
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -11,22 +11,13 @@ import {
   View,
 } from 'react-native';
 
-import { createNote, deleteNote, listNotes, updateNote, type Note } from '../lib/db/notes';
+import { createNote, deleteNote, updateNote, type Note } from '../lib/powersync/notes';
 
 export function NotesScreen() {
-  const db = useSQLiteContext();
-  const [notes, setNotes] = useState<Note[]>([]);
+  const { data: notes } = useQuery<Note>('SELECT * FROM notes ORDER BY updated_at DESC');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
-
-  const refresh = useCallback(async () => {
-    setNotes(await listNotes(db));
-  }, [db]);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
 
   const resetForm = () => {
     setEditingId(null);
@@ -37,29 +28,27 @@ export function NotesScreen() {
   const handleSave = async () => {
     if (!title.trim()) return;
     if (editingId) {
-      await updateNote(db, editingId, title.trim(), content.trim());
+      await updateNote(editingId, title.trim(), content.trim());
     } else {
-      await createNote(db, title.trim(), content.trim());
+      await createNote(title.trim(), content.trim());
     }
     resetForm();
-    await refresh();
   };
 
   const handleEdit = (note: Note) => {
     setEditingId(note.id);
-    setTitle(note.title);
-    setContent(note.content);
+    setTitle(note.title ?? '');
+    setContent(note.content ?? '');
   };
 
   const handleDelete = async (id: string) => {
-    await deleteNote(db, id);
+    await deleteNote(id);
     if (editingId === id) resetForm();
-    await refresh();
   };
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <Text style={styles.header}>Notes (local only, no sync yet)</Text>
+      <Text style={styles.header}>Notes</Text>
       <FlatList
         data={notes}
         keyExtractor={(item) => item.id}
@@ -89,7 +78,7 @@ export function NotesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff', paddingTop: 60, paddingHorizontal: 16 },
+  container: { flex: 1, backgroundColor: '#fff', paddingTop: 16, paddingHorizontal: 16 },
   header: { fontSize: 18, fontWeight: '600', marginBottom: 12 },
   list: { paddingBottom: 12 },
   noteRow: {

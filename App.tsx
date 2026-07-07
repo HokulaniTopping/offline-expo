@@ -1,24 +1,37 @@
+import { PowerSyncContext } from '@powersync/react';
 import { StatusBar } from 'expo-status-bar';
-import { SQLiteProvider } from 'expo-sqlite';
-import { Suspense } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
 
-import { migrateDbIfNeeded } from './lib/db/schema';
+import { SyncStatusIndicator } from './components/SyncStatusIndicator';
+import { Connector } from './lib/powersync/connector';
+import { powersync } from './lib/powersync/client';
 import { NotesScreen } from './screens/NotesScreen';
 
+const connector = new Connector();
+
 export default function App() {
+  useEffect(() => {
+    powersync.connect(connector);
+    return () => {
+      powersync.disconnect();
+    };
+  }, []);
+
   return (
-    <Suspense fallback={<ActivityIndicator style={styles.loading} />}>
-      <SQLiteProvider databaseName="notes.db" onInit={migrateDbIfNeeded} useSuspense>
+    <PowerSyncContext.Provider value={powersync}>
+      <View style={styles.root}>
+        <SyncStatusIndicator />
         <NotesScreen />
         <StatusBar style="auto" />
-      </SQLiteProvider>
-    </Suspense>
+      </View>
+    </PowerSyncContext.Provider>
   );
 }
 
 const styles = StyleSheet.create({
-  loading: {
+  root: {
     flex: 1,
+    paddingTop: 50,
   },
 });
