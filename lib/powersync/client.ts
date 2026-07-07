@@ -1,12 +1,18 @@
-import { OPSqliteOpenFactory } from '@powersync/op-sqlite';
-import { PowerSyncDatabase } from '@powersync/react-native';
+import { PowerSyncDatabase, WASQLiteOpenFactory } from '@powersync/web';
 import { AppSchema } from './schema';
 
-// react-native's PowerSyncDatabase defaults to react-native-quick-sqlite unless
-// given an explicit open factory — we're on op-sqlite, so pass one explicitly.
-const factory = new OPSqliteOpenFactory({ dbFilename: 'notes.db' });
+// Web build: SQLite runs via WASM (wa-sqlite) in a worker instead of a native
+// driver. Worker files are copied into public/@powersync by `powersync-web
+// copy-assets` (see package.json's postinstall script) and served from there.
+const factory = new WASQLiteOpenFactory({
+  dbFilename: 'notes.db',
+  worker: '/@powersync/worker/WASQLiteDB.umd.js',
+});
 
 export const powersync = new PowerSyncDatabase({
   schema: AppSchema,
   database: factory,
+  sync: {
+    worker: '/@powersync/worker/SharedSyncImplementation.umd.js',
+  },
 });

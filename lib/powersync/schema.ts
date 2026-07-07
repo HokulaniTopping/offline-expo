@@ -1,4 +1,4 @@
-import { column, Schema, Table } from '@powersync/react-native';
+import { column, Schema, Table } from '@powersync/web';
 
 // PowerSync auto-adds an `id` primary key column — don't declare one.
 const notes = new Table({

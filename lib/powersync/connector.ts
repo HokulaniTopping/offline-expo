@@ -2,7 +2,7 @@ import {
   type AbstractPowerSyncDatabase,
   type PowerSyncBackendConnector,
   UpdateType,
-} from '@powersync/react-native';
+} from '@powersync/web';
 
 const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL ?? 'http://localhost:8081';
 
