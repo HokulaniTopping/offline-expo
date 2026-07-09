@@ -2,6 +2,7 @@ import { column, Schema, Table } from '@powersync/web';
 
 // PowerSync auto-adds an `id` primary key column — don't declare one.
 const notes = new Table({
+  user_id: column.text,
   title: column.text,
   content: column.text,
   created_at: column.text,

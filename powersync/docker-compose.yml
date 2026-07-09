@@ -97,6 +97,7 @@ services:
       BACKEND_PORT: ${BACKEND_PORT}
       PS_PUBLIC_URL: ${PS_PUBLIC_URL}
       PRIVATE_KEY_PATH: /app/keys/private.jwk.json
+      PUBLIC_KEY_PATH: /app/keys/public.jwk.json
     volumes:
       - ./keys:/app/keys:ro
     ports:
