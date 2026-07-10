@@ -5,6 +5,8 @@
   "dependencies": {
     "@azure/core-asynciterator-polyfill": "^1.0.2",
     "@expo/metro-runtime": "~57.0.2",
+    "@offline-expo/sync-client": "*",
+    "@powersync/common": "^1.57.0",
     "@powersync/react": "^1.10.0",
     "@powersync/web": "^1.38.6",
     "expo": "~57.0.1",

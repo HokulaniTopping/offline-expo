@@ -1,0 +1,15 @@
+{
+  "name": "@offline-expo/sync-client",
+  "version": "0.1.0",
+  "description": "Reusable offline-first sync layer (PowerSync) for company apps: local-first database client, REST upload connector, and sync-status UI.",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "private": true,
+  "peerDependencies": {
+    "@powersync/common": "^1.57.0",
+    "@powersync/react": "^1.10.0",
+    "@powersync/web": "^1.38.0",
+    "react": ">=19",
+    "react-native": ">=0.86"
+  }
+}

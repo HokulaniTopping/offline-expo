@@ -3,12 +3,10 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { SyncStatusIndicator } from './components/SyncStatusIndicator';
-import { Connector } from './lib/powersync/connector';
+import { SyncStatusIndicator } from '@offline-expo/sync-client';
+import { connector } from './lib/powersync/connector';
 import { powersync } from './lib/powersync/client';
 import { NotesScreen } from './screens/NotesScreen';
-
-const connector = new Connector();
 
 export default function App() {
   useEffect(() => {

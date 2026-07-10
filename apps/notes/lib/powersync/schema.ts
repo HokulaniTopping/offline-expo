@@ -1,4 +1,6 @@
-import { column, Schema, Table } from '@powersync/web';
+// Schema building blocks come from @powersync/common (platform-neutral) so
+// this file works unchanged if a native target is ever added.
+import { column, Schema, Table } from '@powersync/common';
 
 // PowerSync auto-adds an `id` primary key column — don't declare one.
 const notes = new Table({
