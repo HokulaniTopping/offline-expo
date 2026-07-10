@@ -1,0 +1,30 @@
+{
+  "name": "@offline-expo/notes",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "dependencies": {
+    "@azure/core-asynciterator-polyfill": "^1.0.2",
+    "@expo/metro-runtime": "~57.0.2",
+    "@powersync/react": "^1.10.0",
+    "@powersync/web": "^1.38.6",
+    "expo": "~57.0.1",
+    "expo-crypto": "~57.0.0",
+    "expo-status-bar": "~57.0.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.0",
+    "react-native-web": "^0.21.2"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-async-generator-functions": "^7.29.7",
+    "@types/react": "~19.2.2",
+    "babel-preset-expo": "~57.0.1",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "postinstall": "powersync-web copy-assets",
+    "start": "expo start --web",
+    "web": "expo start --web"
+  },
+  "private": true
+}
