@@ -8,12 +8,17 @@ export function listNotes(): Promise<Note[]> {
   return powersync.getAll<Note>('SELECT * FROM notes ORDER BY updated_at DESC');
 }
 
+// No real login yet — must match the demo identity the connector authenticates
+// as (lib/powersync/connector.ts). Every note this device creates gets stamped
+// with it, which is what the backend enforces writes against.
+const DEMO_USER_ID = process.env.EXPO_PUBLIC_DEMO_USER ?? 'user-a';
+
 export async function createNote(title: string, content: string): Promise<Note> {
   const now = new Date().toISOString();
-  const note: Note = { id: randomUUID(), title, content, created_at: now, updated_at: now };
+  const note: Note = { id: randomUUID(), user_id: DEMO_USER_ID, title, content, created_at: now, updated_at: now };
   await powersync.execute(
-    'INSERT INTO notes (id, title, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?)',
-    [note.id, note.title, note.content, note.created_at, note.updated_at]
+    'INSERT INTO notes (id, user_id, title, content, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+    [note.id, note.user_id, note.title, note.content, note.created_at, note.updated_at]
   );
   return note;
 }

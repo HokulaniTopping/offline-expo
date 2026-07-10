@@ -3,15 +3,15 @@
 # Sync rules: which rows from Postgres get synced down to devices.
 # Note: changes here require restarting the powersync container to take effect.
 #
-# This is intentionally a single global bucket with no per-user filtering — every
-# connected device sees every note. That's fine for this demo; a real multi-user
-# app would partition by owner_id (see the docs for parameterized streams).
+# Each device only ever receives the notes belonging to the user_id in its own
+# login token — auth.user_id() reads the JWT's `sub` claim directly, so no custom
+# claim is needed. auto_subscribe still works here because the filter comes from
+# the trusted token (an "auth parameter"), not a client-supplied value.
 
 config:
   edition: 3
 
 streams:
-  global:
+  my_notes:
     auto_subscribe: true
-    queries:
-      - SELECT * FROM notes
+    query: SELECT * FROM notes WHERE user_id = auth.user_id()
