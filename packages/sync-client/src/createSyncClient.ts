@@ -1,5 +1,10 @@
 import type { Schema } from '@powersync/common';
-import { PowerSyncDatabase, WASQLiteOpenFactory } from '@powersync/web';
+// The /umd build is precompiled (no `import.meta`), which older Metro versions
+// (e.g. Expo 52) can't parse in the default ESM build — a hard, silent,
+// whole-bundle syntax error. Resolving the /umd subpath requires Metro's
+// package-exports support: default-on in Expo 57+, needs
+// `resolver.unstable_enablePackageExports = true` in metro.config.js before that.
+import { PowerSyncDatabase, WASQLiteOpenFactory } from '@powersync/web/umd';
 
 // This is the ONE platform-specific file in this package: it opens SQLite via
 // WASM (wa-sqlite) in web workers. If a native (iOS/Android) target is ever
