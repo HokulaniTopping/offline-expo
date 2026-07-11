@@ -18,6 +18,12 @@ export interface CreateConnectorOptions {
    * already has, it supplies a path (or query params) that yields a JWT here.
    */
   authPath?: string;
+  /**
+   * Send cookies with the token request (fetch `credentials: 'include'`).
+   * Needed when the app's session lives in an httpOnly cookie (web logins)
+   * rather than a header the connector could attach itself.
+   */
+  credentialsInclude?: boolean;
   /** Maps each synced table name to its backend REST route. */
   tableRoutes: Record<string, TableRoute>;
 }
@@ -32,6 +38,7 @@ export function createConnector({
   backendUrl,
   tableRoutes,
   authPath = '/api/auth/token',
+  credentialsInclude = false,
 }: CreateConnectorOptions): PowerSyncBackendConnector {
   let currentToken: string | null = null;
 
@@ -57,7 +64,9 @@ export function createConnector({
 
   return {
     async fetchCredentials() {
-      const response = await fetch(`${backendUrl}${authPath}`);
+      const response = await fetch(`${backendUrl}${authPath}`, {
+        credentials: credentialsInclude ? 'include' : undefined,
+      });
       if (!response.ok) {
         throw new Error(`Failed to fetch PowerSync credentials: ${response.status}`);
       }
