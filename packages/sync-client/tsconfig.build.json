@@ -1,0 +1,15 @@
+{
+  // Emit config used only by `npm run build` / `npm pack`. The plain
+  // tsconfig.json stays no-emit for editor/typecheck; this one turns emit on
+  // and adds declarations so the published package ships JS + .d.ts, not raw TS.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}
