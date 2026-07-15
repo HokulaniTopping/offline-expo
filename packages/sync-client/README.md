@@ -10,6 +10,14 @@ PowerSync is the engine (local DB + sync loop + offline queue). This package is 
 how conflicts are handled, and how sync status is shown. Bring your schema + ~3 lines of
 config; skip the week of setup.
 
+## What installs
+
+When you install this package you get only the compiled `dist/` (plus `package.json` and
+`README.md`) — the green box below. The source, demo app, and backend stay in the repo, and
+peer dependencies are yours to provide.
+
+<img src="docs/distribution.svg" alt="What downloads when you install @offline-expo/sync-client: the compiled dist/ folder, package.json and README download into your app; source, config, the demo app and Docker backend stay in the repo; react, react-native and the @powersync/* packages are installed separately as peer dependencies." width="680">
+
 ---
 
 ## Requirements
@@ -139,32 +147,64 @@ export const connector = createConnector({
 });
 ```
 
+Already have your own auth (a header, an in-memory token, secure storage, an SDK call)?
+Pass `fetchToken` instead of `authPath` — it takes precedence and lets you plug in whatever
+your app already does:
+```ts
+export const connector = createConnector({
+  backendUrl: process.env.EXPO_PUBLIC_BACKEND_URL ?? 'http://localhost:8081',
+  fetchToken: async () => {
+    const token = await auth.getAccessToken();          // however your app gets it
+    return { token, endpoint: process.env.EXPO_PUBLIC_POWERSYNC_URL! };
+  },
+  tableRoutes: { items: { endpoint: 'items' } },
+});
+```
+
 ### 4. Wire it up
+`SyncProvider` provides the PowerSync React context and owns the connect/disconnect
+lifecycle — so `useQuery`, `useStatus`, and `SyncStatusIndicator` just work. Wrap your app once:
 ```tsx
 // App.tsx
-import { PowerSyncContext } from '@powersync/react';
-import { useEffect } from 'react';
 import { View } from 'react-native';
-import { SyncStatusIndicator } from '@offline-expo/sync-client';
+import { SyncProvider } from '@offline-expo/sync-client';
 import { powersync } from './lib/powersync/client';
 import { connector } from './lib/powersync/connector';
 
 export default function App() {
-  useEffect(() => {
-    powersync.connect(connector);
-    return () => { powersync.disconnect(); };
-  }, []);
-
   return (
-    <PowerSyncContext.Provider value={powersync}>
+    <SyncProvider db={powersync} connector={connector} showStatus>
       <View style={{ flex: 1 }}>
-        <SyncStatusIndicator />
         {/* your screens */}
       </View>
-    </PowerSyncContext.Provider>
+    </SyncProvider>
   );
 }
 ```
+
+<details>
+<summary>Prefer to own the wiring yourself?</summary>
+
+`SyncProvider` is optional sugar. You can provide the context and connect manually — this is
+exactly what it does under the hood:
+```tsx
+import { PowerSyncContext } from '@powersync/react';
+import { useEffect } from 'react';
+import { SyncStatusIndicator } from '@offline-expo/sync-client';
+
+useEffect(() => {
+  powersync.connect(connector);
+  return () => { powersync.disconnect(); };
+}, []);
+
+return (
+  <PowerSyncContext.Provider value={powersync}>
+    <SyncStatusIndicator />
+    {/* your screens */}
+  </PowerSyncContext.Provider>
+);
+```
+</details>
 
 ### Reading and writing
 Reads are reactive via `useQuery`; writes go through `powersync.execute` and sync automatically.
@@ -195,14 +235,23 @@ Returns a web `PowerSyncDatabase`.
 
 ### `createConnector(options)`
 Returns a `PowerSyncBackendConnector` for backends following the [contract](#backend-contract).
-- `backendUrl: string` — base URL of your sync backend.
+- `backendUrl: string` — base URL of your sync backend (used for write uploads).
 - `tableRoutes: Record<string, { endpoint: string }>` — maps each synced table to its REST path.
-- `authPath?: string` — path returning `{ token, endpoint }`. Default `'/api/auth/token'`.
-- `credentialsInclude?: boolean` — send cookies on the token request (for httpOnly-cookie sessions). Default `false`.
+- `fetchToken?: () => Promise<{ token, endpoint }>` — plug in your own auth. When provided, it
+  takes precedence and `authPath`/`credentialsInclude` are ignored.
+- `authPath?: string` — default auth seam: path returning `{ token, endpoint }`. Default `'/api/auth/token'`.
+- `credentialsInclude?: boolean` — send cookies on the default token request (for httpOnly-cookie sessions). Default `false`.
+
+### `SyncProvider`
+A component that provides the PowerSync React context and manages the connect/disconnect
+lifecycle. Renders `SyncStatusIndicator` when `showStatus` is set.
+- `db: AbstractPowerSyncDatabase` — from `createSyncClient`.
+- `connector: PowerSyncBackendConnector` — from `createConnector`.
+- `showStatus?: boolean` — render the status banner above children. Default `false`.
 
 ### `SyncStatusIndicator`
 A `react-native` banner showing connection/sync state (offline / syncing / connecting /
-up-to-date). Must be rendered inside a `PowerSyncContext.Provider`.
+up-to-date). Must be rendered inside a `SyncProvider` (or a `PowerSyncContext.Provider`).
 
 ---
 

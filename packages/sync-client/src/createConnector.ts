@@ -9,19 +9,35 @@ export interface TableRoute {
   endpoint: string;
 }
 
+/** The PowerSync credentials a device needs to open a sync session. */
+export interface SyncCredentials {
+  /** Short-lived JWT the PowerSync service verifies. */
+  token: string;
+  /** PowerSync service URL this device syncs against. */
+  endpoint: string;
+}
+
 export interface CreateConnectorOptions {
   /** Base URL of the app's sync backend, e.g. http://localhost:8091 */
   backendUrl: string;
   /**
-   * Path that returns `{ token, endpoint }` for this device. This is the seam
-   * between the app's login system and the sync layer: whatever auth the app
-   * already has, it supplies a path (or query params) that yields a JWT here.
+   * Plug in the app's own auth. A function returning `{ token, endpoint }`
+   * however the app already gets them — a header, an in-memory token, secure
+   * storage, an SDK call. When provided, `authPath`/`credentialsInclude` are
+   * ignored. Use this when your auth isn't a plain cookie-authenticated GET.
+   */
+  fetchToken?: () => Promise<SyncCredentials>;
+  /**
+   * Default auth seam (used only when `fetchToken` is not given): a path that
+   * returns `{ token, endpoint }` for this device. Whatever auth the app
+   * already has supplies a path (or query params) that yields a JWT here.
    */
   authPath?: string;
   /**
-   * Send cookies with the token request (fetch `credentials: 'include'`).
+   * Send cookies with the default token request (fetch `credentials: 'include'`).
    * Needed when the app's session lives in an httpOnly cookie (web logins)
-   * rather than a header the connector could attach itself.
+   * rather than a header the connector could attach itself. Ignored when
+   * `fetchToken` is provided.
    */
   credentialsInclude?: boolean;
   /** Maps each synced table name to its backend REST route. */
@@ -37,10 +53,22 @@ export interface CreateConnectorOptions {
 export function createConnector({
   backendUrl,
   tableRoutes,
+  fetchToken,
   authPath = '/api/auth/token',
   credentialsInclude = false,
 }: CreateConnectorOptions): PowerSyncBackendConnector {
   let currentToken: string | null = null;
+
+  // Default auth: a GET that yields { token, endpoint }. Overridden by fetchToken.
+  async function fetchTokenViaRest(): Promise<SyncCredentials> {
+    const response = await fetch(`${backendUrl}${authPath}`, {
+      credentials: credentialsInclude ? 'include' : undefined,
+    });
+    if (!response.ok) {
+      throw new Error(`Failed to fetch PowerSync credentials: ${response.status}`);
+    }
+    return response.json();
+  }
 
   async function applyOp(url: string, method: string, body?: unknown) {
     const response = await fetch(url, {
@@ -64,13 +92,7 @@ export function createConnector({
 
   return {
     async fetchCredentials() {
-      const response = await fetch(`${backendUrl}${authPath}`, {
-        credentials: credentialsInclude ? 'include' : undefined,
-      });
-      if (!response.ok) {
-        throw new Error(`Failed to fetch PowerSync credentials: ${response.status}`);
-      }
-      const { token, endpoint } = await response.json();
+      const { token, endpoint } = fetchToken ? await fetchToken() : await fetchTokenViaRest();
       // Stashed so uploadData can attach it — the backend verifies this on
       // every write instead of trusting requests blindly.
       currentToken = token;

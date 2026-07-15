@@ -1,0 +1,32 @@
+<svg width="680" viewBox="0 0 680 400" role="img" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <title>What downloads when someone installs @offline-expo/sync-client</title>
+  <desc>The compiled dist folder, package.json and README download into a consumer's app; source, config, the demo app and backend stay in the repo; peer dependencies are installed separately by the consumer.</desc>
+
+  <g>
+    <rect x="40" y="50" width="290" height="205" rx="12" fill="#E4F5E9" stroke="#9BD3AD"></rect>
+    <text x="56" y="79" fill="#1E5B34" font-size="15" font-weight="500">downloads into their app</text>
+    <text x="56" y="113" fill="#1E5B34" font-size="14">dist/  — compiled js</text>
+    <text x="56" y="139" fill="#1E5B34" font-size="14">dist/  — .d.ts type defs</text>
+    <text x="56" y="165" fill="#1E5B34" font-size="14">package.json</text>
+    <text x="56" y="191" fill="#1E5B34" font-size="14">README.md</text>
+    <text x="56" y="229" fill="#2E7D4C" font-size="12">built from src via tsc · ≈24 kB, 18 files</text>
+  </g>
+
+  <g>
+    <rect x="350" y="50" width="290" height="205" rx="12" fill="#EEF0F2" stroke="#C7CCD1"></rect>
+    <text x="366" y="79" fill="#33383D" font-size="15" font-weight="500">stays in the repo</text>
+    <text x="366" y="111" fill="#33383D" font-size="14">src/  (typescript source)</text>
+    <text x="366" y="135" fill="#33383D" font-size="14">tsconfig · tsconfig.build</text>
+    <text x="366" y="159" fill="#33383D" font-size="14">apps/notes  (demo app)</text>
+    <text x="366" y="183" fill="#33383D" font-size="14">powersync  (docker backend)</text>
+    <text x="366" y="207" fill="#33383D" font-size="14">root workspace config</text>
+    <text x="366" y="231" fill="#33383D" font-size="14">node_modules · *.tgz</text>
+  </g>
+
+  <g>
+    <rect x="40" y="285" width="600" height="90" rx="12" fill="#E7EEFB" stroke="#A9C2ED"></rect>
+    <text x="56" y="314" fill="#1E3F7A" font-size="15" font-weight="500">they install alongside — peerDependencies</text>
+    <text x="56" y="341" fill="#1E3F7A" font-size="12">react · react-native</text>
+    <text x="56" y="361" fill="#1E3F7A" font-size="12">@powersync/web · @powersync/react · @powersync/common</text>
+  </g>
+</svg>
