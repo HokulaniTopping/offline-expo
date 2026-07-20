@@ -2,6 +2,7 @@
   "name": "@offline-expo/sync-client",
   "version": "0.1.0",
   "description": "Reusable offline-first sync layer (PowerSync) for company apps: local-first database client, REST upload connector, and sync-status UI.",
+  "license": "MIT",
   "keywords": [
     "powersync",
     "offline-first",
