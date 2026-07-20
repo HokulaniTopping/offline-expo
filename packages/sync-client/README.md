@@ -10,6 +10,40 @@ PowerSync is the engine (local DB + sync loop + offline queue). This package is 
 how conflicts are handled, and how sync status is shown. Bring your schema + ~3 lines of
 config; skip the week of setup.
 
+## Quick start
+
+Already a PowerSync web/Expo app with a REST backend (see [Requirements](#requirements))?
+Adding offline sync is an install plus a few lines:
+
+```bash
+expo install @offline-expo/sync-client
+npx expo install @powersync/common @powersync/react @powersync/web react react-native
+```
+
+```tsx
+import { createSyncClient, createConnector, SyncProvider } from '@offline-expo/sync-client';
+import { AppSchema } from './schema';
+
+const db = createSyncClient(AppSchema, { dbFilename: 'myapp.db' });
+const connector = createConnector({
+  backendUrl: process.env.EXPO_PUBLIC_BACKEND_URL!,
+  tableRoutes: { items: { endpoint: 'items' } }, // table name -> /api/items/:id
+});
+
+export default function App() {
+  return (
+    <SyncProvider db={db} connector={connector} showStatus>
+      {/* your screens — useQuery / useStatus / SyncStatusIndicator all work here */}
+    </SyncProvider>
+  );
+}
+```
+
+`SyncProvider` supplies the PowerSync React context and owns the connect/disconnect lifecycle,
+so there's no boilerplate to wire up. Got your own auth? Pass `fetchToken` to `createConnector`
+instead of relying on the default token endpoint. Full walkthrough — schema, one-time app-side
+setup, and every option — is below.
+
 ## What installs
 
 When you install this package you get only the compiled `dist/` (plus `package.json` and
