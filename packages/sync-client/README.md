@@ -16,7 +16,7 @@ When you install this package you get only the compiled `dist/` (plus `package.j
 `README.md`) — the green box below. The source, demo app, and backend stay in the repo, and
 peer dependencies are yours to provide.
 
-<img src="docs/distribution.svg" alt="What downloads when you install @offline-expo/sync-client: the compiled dist/ folder, package.json and README download into your app; source, config, the demo app and Docker backend stay in the repo; react, react-native and the @powersync/* packages are installed separately as peer dependencies." width="680">
+<img src="https://raw.githubusercontent.com/HokulaniTopping/offline-expo/main/packages/sync-client/docs/distribution.svg" alt="What downloads when you install @offline-expo/sync-client: the compiled dist/ folder, package.json and README download into your app; source, config, the demo app and Docker backend stay in the repo; react, react-native and the @powersync/* packages are installed separately as peer dependencies." width="680">
 
 ---
 
@@ -35,24 +35,32 @@ This package is **not** a drop-in for any app. A consuming app must be:
 
 ## Installation
 
-### From a tarball (current)
-Until this is published to a registry, install the packed tarball directly:
+```bash
+expo install @offline-expo/sync-client
+# or: npm install @offline-expo/sync-client
+```
+
+### Peer dependencies
+Install these in the consuming app too (versions should match its Expo SDK):
+
+```bash
+npx expo install @powersync/common @powersync/react @powersync/web react react-native
+```
+
+<details>
+<summary>Installing from a local tarball instead (unpublished / pre-release)</summary>
+
+If you're testing an unpublished build, install the packed tarball directly:
 
 ```bash
 npm install /path/to/offline-expo-sync-client-0.1.0.tgz
 # or: pnpm add /path/to/offline-expo-sync-client-0.1.0.tgz
 ```
 
-> ⚠️ Use `npm`/`pnpm`, **not** `npx expo install`, for a local tarball — `expo install`
-> mis-records a local `.tgz` (writes an `undefined` dependency). `expo install` only works
-> correctly once the package is published to a registry.
-
-### Peer dependencies
-Install these in the consuming app (versions should match its Expo SDK):
-
-```bash
-npx expo install @powersync/common @powersync/react @powersync/web react react-native
-```
+> ⚠️ Use `npm`/`pnpm`, **not** `npx expo install`, for a *local* `.tgz` — `expo install`
+> mis-records it (writes an `undefined` dependency). `expo install` only works against the
+> published registry version.
+</details>
 
 ---
 
@@ -290,4 +298,21 @@ A matching self-hostable backend + PowerSync stack lives in `powersync/` in this
   full package to Expo/RN. The core (`createSyncClient` + `createConnector`) is framework-neutral
   web JS and can run in any web-React app.
 - **One backend convention.** Non-REST backends (e.g. GraphQL) need a custom connector.
-- **Not published.** Distributed as a tarball for now; publishing unlocks `expo install`.
+
+---
+
+## Publishing (maintainers)
+
+Published to the public npm registry as `@offline-expo/sync-client`.
+
+```bash
+cd packages/sync-client
+npm version patch          # or minor / major — bumps version + tags
+npm publish                # prepack runs clean + build; publishConfig makes it public
+```
+
+- `prepack` rebuilds `dist/` automatically, and `files: ["dist"]` keeps the published tarball
+  to the compiled output (see [What installs](#what-installs)).
+- First publish requires the `@offline-expo` scope/org to exist on npm and your account to
+  have publish rights to it (`npm login` first).
+- Verify before shipping with `npm publish --dry-run` (prints the exact file list).
