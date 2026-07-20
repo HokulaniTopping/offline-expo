@@ -2,6 +2,25 @@
   "name": "@offline-expo/sync-client",
   "version": "0.1.0",
   "description": "Reusable offline-first sync layer (PowerSync) for company apps: local-first database client, REST upload connector, and sync-status UI.",
+  "license": "MIT",
+  "keywords": [
+    "powersync",
+    "offline-first",
+    "local-first",
+    "expo",
+    "react-native",
+    "sync",
+    "sqlite"
+  ],
+  "homepage": "https://github.com/HokulaniTopping/offline-expo/tree/main/packages/sync-client#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HokulaniTopping/offline-expo.git",
+    "directory": "packages/sync-client"
+  },
+  "bugs": {
+    "url": "https://github.com/HokulaniTopping/offline-expo/issues"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -13,7 +32,9 @@
   "files": [
     "dist"
   ],
-  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch",

@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect } from 'react';
 import type { AbstractPowerSyncDatabase, PowerSyncBackendConnector } from '@powersync/common';
 import { PowerSyncContext } from '@powersync/react';
+import { View } from 'react-native';
 import { SyncStatusIndicator } from './SyncStatusIndicator';
 
 export interface SyncProviderProps {
@@ -36,8 +37,16 @@ export function SyncProvider({ db, connector, showStatus = false, children }: Sy
 
   return (
     <PowerSyncContext.Provider value={db}>
-      {showStatus ? <SyncStatusIndicator /> : null}
-      {children}
+      {showStatus ? (
+        // Establish a flex column so the banner sits above content that fills
+        // the rest — the context provider emits no layout node of its own.
+        <View style={{ flex: 1 }}>
+          <SyncStatusIndicator />
+          {children}
+        </View>
+      ) : (
+        children
+      )}
     </PowerSyncContext.Provider>
   );
 }
